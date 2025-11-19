@@ -21,6 +21,12 @@
         repoUrl: "https://github.com/juliafbowman/Hello-Roomie"
       },
       {
+        name: "Heatstroke Wristband",
+        dateTaken: "Fall 2024",
+        language: "JS / HTML",
+        repoUrl: "https://github.com/juliafbowman/heatStrokeWristband"
+      },
+      {
         name: "Systrum",
         dateTaken: "Spring 2025",
         language: "Python / JS / HTML",
@@ -31,7 +37,7 @@
         dateTaken: "Spring 2025",
         language: "Python / JS / HTML",
         repoUrl: "https://github.com/juliafbowman/SparkHacks2025"
-      }
+      },
     ];
   </script>
   

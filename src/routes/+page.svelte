@@ -1,11 +1,15 @@
 <!-- homepage -->
 <script>
-  import { asset } from '$app/paths';
-  </script>  
-
-<main>
+    import { asset } from '$app/paths';
+  
+    let isClosed = false;
+    let isCollapsed = false;
+    let isZoomed = false;
+  </script>
+  
+  <main>
     <div class="page-container">
-      <!-- left + right background flowers -->
+      <!-- left and right background flowers -->
       <div class="background">
         <div class="left-image">
           <img src={asset('/flowers/flower1.png')} alt="flower1 :3" />
@@ -36,36 +40,79 @@
   
       <!-- content -->
       <div class="content">
-        <div class="browser-container">
-          <div class="top-bar">
-            <div class="control-lights">
-              <div class="light red"></div>
-              <div class="light yellow"></div>
-              <div class="light green"></div>
+        {#if !isClosed}
+          <div
+            class="browser-container"
+            class:zoomed={isZoomed}
+            class:collapsed={isCollapsed}
+          >
+            <div class="top-bar">
+              <div class="control-lights">
+                <!-- red - close window -->
+                <button
+                  type="button"
+                  class="light red"
+                  aria-label="Close window"
+                  on:click={() => {
+                    isClosed = true;
+                    isCollapsed = false;
+                    isZoomed = false;
+                  }}
+                ></button>
+  
+                <!-- yellow - minimize (collapse content) -->
+                <button
+                  type="button"
+                  class="light yellow"
+                  aria-label="Minimize window"
+                  on:click={() => {
+                    isCollapsed = !isCollapsed;
+                  }}
+                ></button>
+  
+                <!-- green - zoom -->
+                <button
+                  type="button"
+                  class="light green"
+                  aria-label="Zoom window"
+                  on:click={() => {
+                    isZoomed = !isZoomed;
+                  }}
+                ></button>
+              </div>
+              <div class="title">
+                {isCollapsed ? 'hello (minimized)' : 'hello'}
+              </div>
             </div>
-            <div class="title">hello</div>
+  
+            <!-- content hides when collapsed -->
+            {#if !isCollapsed}
+              <div class="browser-box">
+                <h1 class="welcome-title">Welcome</h1>
+  
+                <p class="intro-text">
+                  I’m <strong>Julia Bowman</strong>, a Computer Science student at the
+                  <strong>University of Illinois Chicago</strong>.
+                </p>
+  
+                <p class="status-text">
+                  Currently at
+                  <span class="graduation" data-tooltip="Graduation Fall 2025"
+                    >senior standing</span
+                  >.
+                </p>
+  
+                <hr class="divider" />
+  
+                <p class="explore-text">Feel free to take a look around : )</p>
+              </div>
+            {/if}
           </div>
-  
-          <div class="browser-box">
-            <h1 class="welcome-title">Welcome</h1>
-  
-            <p class="intro-text">
-              I’m <strong>Julia Bowman</strong>, a Computer Science student at the
-              <strong>University of Illinois Chicago</strong>.
-            </p>
-  
-            <p class="status-text">
-              Currently at
-              <span class="graduation" data-tooltip="Graduation Fall 2025"
-                >senior standing</span
-              >.
-            </p>
-  
-            <hr class="divider" />
-  
-            <p class="explore-text">Feel free to take a look around : )</p>
-          </div>
-        </div>
+        {:else}
+          <button class="reopen-button" on:click={() => (isClosed = false)}>
+            reopen window
+          </button>
+        {/if}
   
         <div class="title-container">
           <a
@@ -101,8 +148,8 @@
     }
   
     main {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
-      system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        sans-serif;
       padding: 2rem;
       min-height: 100vh;
     }
@@ -113,6 +160,7 @@
       align-items: flex-start;
       gap: 1rem;
       padding: 35px;
+      width: 100%; /* keep full page width so card width is stable */
     }
   
     /* -------------------------
@@ -253,13 +301,24 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 520px;
+      max-width: 520px; /* card width */
       border-radius: 18px;
       border: 1px solid #e3e3e8;
       overflow: hidden;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(8px);
       box-shadow: 0 14px 30px rgba(0, 0, 0, 0.07);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+  
+    .browser-container.zoomed {
+      transform: scale(1.03);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.11);
+    }
+  
+    /* height collapses, width stays the same bc of maxwidth/width above */
+    .browser-container.collapsed .browser-box {
+      display: none;
     }
   
     .top-bar {
@@ -280,16 +339,85 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
+      background-color: #ddd;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+  
+      /* reset button defaults */
+      border: none;
+      padding: 0;
+      outline: none;
     }
   
-    .light.red {
+    .control-lights .light:focus-visible {
+      outline: 2px solid rgba(0, 0, 0, 0.55);
+      outline-offset: 2px;
+    }
+  
+    .control-lights .light:active {
+      transform: scale(0.9);
+    }
+  
+    .control-lights .light::before,
+    .control-lights .light::after {
+      content: "";
+      position: absolute;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+  
+    .control-lights:hover .light::before,
+    .control-lights:hover .light::after {
+      opacity: 0.75;
+    }
+  
+    .control-lights .light.red {
       background-color: #ff605c;
     }
-    .light.yellow {
+  
+    .control-lights .light.red::before {
+      content: "×";
+      font-size: 10px;
+      margin-top: -1px;
+      color: rgba(0, 0, 0, 0.7);
+    }
+  
+    .control-lights .light.yellow {
       background-color: #ffbd44;
     }
-    .light.green {
+  
+    .control-lights .light.yellow::before {
+      content: "–";
+      font-size: 12px;
+      margin-top: -1px;
+      color: rgba(0, 0, 0, 0.7);
+    }
+  
+    .control-lights .light.green {
       background-color: #00ca4e;
+    }
+  
+    /* top-left arrow (points ↙) */
+    .control-lights .light.green::before {
+      content: "";
+      position: absolute;
+      border-style: solid;
+      border-width: 4px 4px 0 0;
+      border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+      transform: translate(-1px, -1px) rotate(0deg);
+    }
+  
+    /* bottom-right arrow (points ↗) */
+    .control-lights .light.green::after {
+      content: "";
+      position: absolute;
+      border-style: solid;
+      border-width: 0 0 4px 4px;
+      border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent;
+      transform: translate(1px, 1px) rotate(0deg);
     }
   
     .title {
@@ -363,6 +491,26 @@
     .graduation:hover::after {
       opacity: 1;
       visibility: visible;
+    }
+  
+    .reopen-button {
+      border-radius: 999px;
+      border: 1px solid #dadade;
+      padding: 0.4rem 0.9rem;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      color: #555;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(6px);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      opacity: 0.95;
+    }
+  
+    .reopen-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      opacity: 1;
     }
   
     /* -------------------------
