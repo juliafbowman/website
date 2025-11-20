@@ -27,7 +27,7 @@
     <div class="left-image4">
       <img src={asset('/backgrounds/sunlight.jpg')} alt="sunlight" class="centered-image" />
       <p class="caption">
-        Countryside (<i>landscape</i>): Rolling <a href="https://en.wikipedia.org/wiki/countryside" target="_blank" class="highlight">countryside</a> hills seen through a mist.
+        Forest (<i>sunlight</i>): Soft <a href="https://en.wikipedia.org/wiki/sunlight" target="_blank" class="highlight">sunlight</a> seen filtering through branches.
       </p>
     </div>
 
